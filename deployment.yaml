@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: warrant-edge
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: warrant-edge
+  template:
+    metadata:
+      labels:
+        name: warrant-edge
+    spec:
+      containers:
+        - name: edge-agent
+          image: warrantdev/edge-agent:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: API_KEY
+              value: REPLACE_ME
+            - name: DATASTORE
+              value: redis
+            - name: REDIS_HOSTNAME
+              value: REPLACE_ME
+            - name: REDIS_PASSWORD
+              value: REPLACE_ME
+            - name: REDIS_PORT
+              value: 6379
+      imagePullSecrets:
+        - name: regcred
