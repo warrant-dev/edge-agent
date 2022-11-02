@@ -1,2 +1,6 @@
+.vscode
+.DS_Store
+build/
+dist/
 agent.properties
 bin
