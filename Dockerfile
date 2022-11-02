@@ -4,7 +4,7 @@ RUN addgroup -S warrant-edge && adduser -S warrant-edge -G warrant-edge
 USER warrant-edge
 
 WORKDIR ./
-COPY ./bin/edge-agent ./
+COPY ./edge-agent ./
 
 ENTRYPOINT ["./edge-agent"]
 
