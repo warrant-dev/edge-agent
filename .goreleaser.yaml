@@ -38,4 +38,4 @@ dockers:
     skip_push: false
     dockerfile: "Dockerfile"
     build_flag_templates:
-      - "--platform linux/amd64"
+      - "--platform=linux/amd64"
