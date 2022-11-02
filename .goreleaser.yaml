@@ -1,0 +1,41 @@
+before:
+  hooks:
+    # - go mod tidy
+    # - go generate ./...
+builds:
+  - env:
+      - CGO_ENABLED=0
+    binary: edge-agent
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+archives:
+  - replacements:
+      darwin: Darwin
+      linux: Linux
+      windows: Windows
+      386: i386
+      amd64: x86_64
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+dockers:
+  - image_templates:
+      - "warrantdev/edge-agent:{{ .Tag }}"
+      - "warrantdev/edge-agent:latest"
+    goos: linux
+    goarch: amd64
+    use: docker
+    skip_push: false
+    dockerfile: "Dockerfile"
+    build_flag_templates:
+      - "--platform linux/amd64"

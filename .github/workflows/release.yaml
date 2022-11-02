@@ -1,27 +1,31 @@
-name: Build Warrant Edge Agent
+name: Release Warrant Edge Agent
 
 on:
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    tags:
+      - "*"
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Go Env
         uses: actions/setup-go@v3
         with:
           go-version: "^1.14.3"
+      - name: Docker login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      - name: Build Agent
-        run: make build
-      - name: GoReleaser Check
+      - name: Release with GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
           distribution: goreleaser
           version: latest
-          args: check
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
