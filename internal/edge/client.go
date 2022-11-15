@@ -18,7 +18,7 @@ import (
 const EVENT_SET_WARRANTS = "set_warrants"
 const EVENT_DEL_WARRANTS = "del_warrants"
 const EVENT_RESET_WARRANTS = "reset_warrants"
-const SHUTDOWN = "shutdown"
+const EVENT_SHUTDOWN = "shutdown"
 
 type ClientConfig struct {
 	ApiKey            string
@@ -140,8 +140,8 @@ func (client *Client) processEvent(event *sse.Event) {
 		err = client.processDelWarrants(event)
 	case EVENT_RESET_WARRANTS:
 		err = client.initialize()
-	case SHUTDOWN:
-		log.Fatal("Shutting down.")
+	case EVENT_SHUTDOWN:
+		log.Fatal("Shutdown event received. Shutting down.")
 	}
 
 	if err != nil {
