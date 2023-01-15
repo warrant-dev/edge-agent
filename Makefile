@@ -22,7 +22,7 @@ dev: clean
 .PHONY: build
 build: clean
 	$(GOCMD) get
-	$(GOENV) $(GOBUILD) $(BUILD_PATH) main.go
+	$(GOENV) $(GOBUILD) $(BUILD_PATH) -ldflags="-s -w" main.go
 
 .PHONY: docker
 docker:
