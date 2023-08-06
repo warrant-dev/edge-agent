@@ -31,13 +31,34 @@ changelog:
       - '^docs:'
       - '^test:'
 dockers:
-  - image_templates:
-      - "warrantdev/edge-agent:{{ .Tag }}"
-      - "warrantdev/edge-agent:latest"
+  - id: edge-agent-amd64
+    image_templates:
+      - "warrantdev/edge-agent:{{ .Tag }}-amd64"
+      - "warrantdev/edge-agent:latest-amd64"
     goos: linux
     goarch: amd64
-    use: docker
+    use: buildx
     skip_push: false
     dockerfile: "Dockerfile"
     build_flag_templates:
       - "--platform=linux/amd64"
+  - id: edge-agent-arm64
+    image_templates:
+      - "warrantdev/edge-agent:{{ .Tag }}-arm64"
+      - "warrantdev/edge-agent:latest-arm64"
+    goos: linux
+    goarch: arm64
+    use: buildx
+    skip_push: false
+    dockerfile: "Dockerfile"
+    build_flag_templates:
+      - "--platform=linux/arm64"
+docker_manifests:
+  - name_template: "warrantdev/edge-agent:{{ .Tag }}"
+    image_templates:
+      - "warrantdev/edge-agent:{{ .Tag }}-amd64"
+      - "warrantdev/edge-agent:{{ .Tag }}-arm64"
+  - name_template: "warrantdev/edge-agent:latest"
+    image_templates:
+      - "warrantdev/edge-agent:latest-amd64"
+      - "warrantdev/edge-agent:latest-arm64"
