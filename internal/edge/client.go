@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -88,11 +88,15 @@ func (client *Client) initialize() error {
 
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
-		msg, _ := ioutil.ReadAll(resp.Body)
-		return fmt.Errorf("HTTP %d %s", respStatus, string(msg))
+		msg, err := io.ReadAll(resp.Body)
+		errMsg := ""
+		if err == nil {
+			errMsg = string(msg)
+		}
+		return fmt.Errorf("HTTP %d %s", respStatus, errMsg)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response %w", err)
 	}
