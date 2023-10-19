@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package datastore
+package edge
+
+const (
+	DatastoreMemory = "memory"
+	DatastoreRedis  = "redis"
+)
 
 type IRepository interface {
 	Get(key string) (bool, error)
 	Set(key string, count uint16) error
 	Incr(key string) error
 	Decr(key string) error
+	Update(warrants WarrantSet) error
 	Clear() error
 	SetReady(isReady bool)
 	Ready() bool

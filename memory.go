@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package datastore
+package edge
 
 import (
-	"log"
 	"sync"
 )
 
-const DATASTORE_MEMORY = "memory"
-
 type WarrantCache struct {
 	hashCount map[string]uint16
-	lock      sync.Mutex
+	lock      sync.RWMutex
 }
 
 func (cache *WarrantCache) Contains(key string) bool {
-	cache.lock.Lock()
-	defer cache.lock.Unlock()
+	cache.lock.RLock()
+	defer cache.lock.RUnlock()
 
 	_, ok := cache.hashCount[key]
 	return ok
@@ -67,9 +64,28 @@ func (cache *WarrantCache) Decr(key string) {
 	}
 }
 
-func (cache *WarrantCache) Clear() {
-	log.Printf("Clearing cache")
+func (cache *WarrantCache) Update(warrants WarrantSet) error {
+	cache.lock.Lock()
+	defer cache.lock.Unlock()
 
+	// iterate over existing records and remove any that no longer exist
+	for key := range cache.hashCount {
+		if warrants.Has(key) {
+			cache.Set(key, warrants.Get(key))
+		} else {
+			delete(cache.hashCount, key)
+		}
+	}
+
+	// add any newly created records
+	for key, value := range warrants {
+		cache.Set(key, value)
+	}
+
+	return nil
+}
+
+func (cache *WarrantCache) Clear() {
 	cache.lock.Lock()
 	defer cache.lock.Unlock()
 	cache.hashCount = make(map[string]uint16)
@@ -77,7 +93,7 @@ func (cache *WarrantCache) Clear() {
 
 type MemoryRepository struct {
 	cache *WarrantCache
-	lock  sync.Mutex
+	lock  sync.RWMutex
 	ready bool
 }
 
@@ -109,6 +125,10 @@ func (repo *MemoryRepository) Decr(key string) error {
 	return nil
 }
 
+func (repo *MemoryRepository) Update(warrants WarrantSet) error {
+	return repo.cache.Update(warrants)
+}
+
 func (repo *MemoryRepository) Clear() error {
 	repo.cache.hashCount = make(map[string]uint16)
 	return nil
@@ -122,8 +142,8 @@ func (repo *MemoryRepository) SetReady(newReady bool) {
 }
 
 func (repo *MemoryRepository) Ready() bool {
-	repo.lock.Lock()
-	defer repo.lock.Unlock()
+	repo.lock.RLock()
+	defer repo.lock.RUnlock()
 
 	return repo.ready
 }
