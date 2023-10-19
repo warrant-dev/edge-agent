@@ -33,6 +33,7 @@ const (
 	PropertyRedisPort         = "REDIS_PORT"
 	PropertyStreamingEndpoint = "STREAMING_ENDPOINT"
 	PropertyUpdateStrategy    = "UPDATE_STRATEGY"
+	PropertyReadOnly          = "READ_ONLY"
 )
 
 var ErrInvalidDatastoreType = errors.New("invalid datastore type")
@@ -49,6 +50,7 @@ func main() {
 	viper.SetDefault(PropertyRedisHostname, os.Getenv(PropertyRedisHostname))
 	viper.SetDefault(PropertyRedisPort, os.Getenv(PropertyRedisPort))
 	viper.SetDefault(PropertyRedisPassword, os.Getenv(PropertyRedisPassword))
+	viper.SetDefault(PropertyReadOnly, os.Getenv(PropertyReadOnly))
 
 	if err := viper.ReadInConfig(); err != nil {
 		if errors.Is(err, viper.ConfigFileNotFoundError{}) {
@@ -76,6 +78,28 @@ func main() {
 		log.Fatal(ErrInvalidDatastoreType)
 	}
 
+	// initialize and start client
+	if !viper.GetBool(PropertyReadOnly) {
+		log.Println("Starting edge agent")
+		client, err := edge.NewClient(edge.ClientConfig{
+			ApiKey:            viper.GetString(PropertyApiKey),
+			ApiEndpoint:       viper.GetString(PropertyApiEndpoint),
+			StreamingEndpoint: viper.GetString(PropertyStreamingEndpoint),
+			UpdateStrategy:    viper.GetString(PropertyUpdateStrategy),
+			Repository:        repo,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		go func() {
+			log.Fatal(client.Run())
+		}()
+	} else {
+		log.Println("Starting edge agent in read-only mode")
+	}
+
+	// initialize and start server
 	server, err := edge.NewServer(edge.ServerConfig{
 		Port:       3000,
 		ApiKey:     viper.GetString(PropertyApiKey),
@@ -85,19 +109,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	client, err := edge.NewClient(edge.ClientConfig{
-		ApiKey:            viper.GetString(PropertyApiKey),
-		ApiEndpoint:       viper.GetString(PropertyApiEndpoint),
-		StreamingEndpoint: viper.GetString(PropertyStreamingEndpoint),
-		UpdateStrategy:    viper.GetString(PropertyUpdateStrategy),
-		Repository:        repo,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	go func() {
-		log.Fatal(client.Run())
-	}()
 	log.Fatal(server.Run())
 }

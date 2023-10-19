@@ -34,7 +34,6 @@ const (
 type ServerConfig struct {
 	ApiKey     string
 	Port       int
-	StoreType  string
 	Repository IRepository
 }
 
@@ -46,6 +45,20 @@ func NewServer(config ServerConfig) (*Server, error) {
 	return &Server{
 		config: config,
 	}, nil
+}
+
+func (server *Server) health(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodPost {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if server.config.Repository.Ready() {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
+	w.WriteHeader(http.StatusInternalServerError)
 }
 
 func (server *Server) check(w http.ResponseWriter, r *http.Request) {
@@ -136,9 +149,10 @@ func (server *Server) check(w http.ResponseWriter, r *http.Request) {
 
 func (server *Server) Run() error {
 	mux := http.NewServeMux()
+	mux.Handle("/health", loggingMiddleware(http.HandlerFunc(server.health)))
 	mux.Handle(fmt.Sprintf("/%s/authorize", ApiVersion), loggingMiddleware(http.HandlerFunc(server.check)))
 	mux.Handle(fmt.Sprintf("/%s/check", ApiVersion), loggingMiddleware(http.HandlerFunc(server.check)))
 
-	log.Printf("Serving authz requests on port %d", server.config.Port)
+	log.Printf("Edge agent ready to serve authz requests on port %d", server.config.Port)
 	return http.ListenAndServe(fmt.Sprintf(":%d", server.config.Port), mux)
 }

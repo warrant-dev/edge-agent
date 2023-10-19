@@ -116,20 +116,17 @@ func NewClient(conf ClientConfig) (*Client, error) {
 }
 
 func (client *Client) Run() error {
-	log.Println("Starting edge client...")
 	err := client.initialize()
 	if err != nil {
-		return errors.Wrap(err, "error trying to initialize edge client")
+		return errors.Wrap(err, "error trying to initialize edge agent")
 	}
 
-	log.Println("Edge client initialized.")
-
-	/*if client.config.UpdateStrategy == UpdateStrategyStreaming {
+	if client.config.UpdateStrategy == UpdateStrategyStreaming {
 		err = client.connect()
 		if err != nil {
 			return errors.Wrap(err, "error streaming warrant updates")
 		}
-	} else*/if client.config.UpdateStrategy == UpdateStrategyPolling {
+	} else if client.config.UpdateStrategy == UpdateStrategyPolling {
 		err = client.poll()
 		if err != nil {
 			return errors.Wrap(err, "error polling warrant updates")
@@ -177,7 +174,6 @@ func (client *Client) connect() error {
 func (client *Client) poll() error {
 	for {
 		time.Sleep(time.Second * time.Duration(client.config.PollingFrequency))
-		log.Println("fetching latest warrants")
 		warrants, err := client.getWarrants()
 		if err != nil {
 			return errors.Wrap(err, "error getting warrants")
