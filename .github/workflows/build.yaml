@@ -19,6 +19,7 @@ jobs:
           fetch-depth: 2
       - name: Build Agent
         run: make build
+        working-directory: cmd/edge-agent
       - name: GoReleaser Check
         uses: goreleaser/goreleaser-action@v4
         with:
