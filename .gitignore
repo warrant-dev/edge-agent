@@ -2,5 +2,5 @@
 .DS_Store
 build/
 dist/
-agent.properties
-bin
+cmd/edge-agent/agent.properties
+cmd/edge-agent/bin
