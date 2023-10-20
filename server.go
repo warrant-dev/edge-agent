@@ -82,7 +82,7 @@ func (server *Server) check(w http.ResponseWriter, r *http.Request) {
 	var result string
 	switch checkManySpec.Op {
 	case OpAnyOf:
-		code = http.StatusUnauthorized
+		code = http.StatusForbidden
 		result = ResultNotAuthorized
 
 		for _, wnt := range checkManySpec.Warrants {
@@ -110,7 +110,7 @@ func (server *Server) check(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if !match {
-				code = http.StatusUnauthorized
+				code = http.StatusForbidden
 				result = ResultNotAuthorized
 				break
 			}
@@ -136,7 +136,7 @@ func (server *Server) check(w http.ResponseWriter, r *http.Request) {
 			code = http.StatusOK
 			result = ResultAuthorized
 		} else {
-			code = http.StatusUnauthorized
+			code = http.StatusForbidden
 			result = ResultNotAuthorized
 		}
 	}
