@@ -7,7 +7,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/r3labs/sse v0.0.0-20210224172625-26fe804710bc
 	github.com/spf13/viper v1.17.0
-	github.com/warrant-dev/warrant v0.59.0
+	github.com/warrant-dev/warrant v1.0.0
 	gopkg.in/cenkalti/backoff.v1 v1.1.0
 )
 
