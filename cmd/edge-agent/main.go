@@ -47,6 +47,7 @@ func main() {
 	viper.SetDefault(PropertyApiKey, os.Getenv(PropertyApiKey))
 	viper.SetDefault(PropertyApiEndpoint, os.Getenv(PropertyApiEndpoint))
 	viper.SetDefault(PropertyUpdateStrategy, os.Getenv(PropertyUpdateStrategy))
+	viper.SetDefault(PropertyPollingFrequency, os.Getenv(PropertyPollingFrequency))
 	viper.SetDefault(PropertyStreamingEndpoint, os.Getenv(PropertyStreamingEndpoint))
 	viper.SetDefault(PropertyDatastore, os.Getenv(PropertyDatastore))
 	viper.SetDefault(PropertyRedisHostname, os.Getenv(PropertyRedisHostname))
