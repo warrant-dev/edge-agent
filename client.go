@@ -21,6 +21,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -45,7 +46,7 @@ const (
 
 var (
 	ErrInvalidUpdateStrategy   = errors.New("invalid update strategy")
-	ErrInvalidPollingFrequency = errors.New("invalid polling frequency (cannot be < 10s)")
+	ErrInvalidPollingFrequency = errors.New("invalid polling frequency (must be >= 10)")
 	ErrMissingApiKey           = errors.New("missing API key")
 )
 
@@ -90,13 +91,12 @@ func NewClient(conf ClientConfig) (*Client, error) {
 		config.UpdateStrategy = conf.UpdateStrategy
 	}
 
-	if conf.PollingFrequency != 0 {
-		config.PollingFrequency = conf.PollingFrequency
-	} else if config.PollingFrequency < 10 {
+	if conf.PollingFrequency < 10 {
 		return nil, ErrInvalidPollingFrequency
 	}
+	config.PollingFrequency = conf.PollingFrequency
 
-	if config.UpdateStrategy == UpdateStrategyStreaming {
+	if strings.EqualFold(config.UpdateStrategy, UpdateStrategyStreaming) {
 		streamingClient := sse.NewClient(fmt.Sprintf("%s/events", config.StreamingEndpoint))
 		streamingClient.Headers["Authorization"] = fmt.Sprintf("ApiKey %s", config.ApiKey)
 		streamingClient.ReconnectStrategy = backoff.WithMaxTries(backoff.NewExponentialBackOff(), 10)
@@ -106,7 +106,7 @@ func NewClient(conf ClientConfig) (*Client, error) {
 			config:          config,
 			streamingClient: streamingClient,
 		}, nil
-	} else if config.UpdateStrategy == UpdateStrategyPolling || config.UpdateStrategy == "" {
+	} else if strings.EqualFold(config.UpdateStrategy, UpdateStrategyPolling) {
 		return &Client{
 			config: config,
 		}, nil
@@ -121,12 +121,12 @@ func (client *Client) Run() error {
 		return errors.Wrap(err, "error trying to initialize edge agent")
 	}
 
-	if client.config.UpdateStrategy == UpdateStrategyStreaming {
+	if strings.EqualFold(client.config.UpdateStrategy, UpdateStrategyStreaming) {
 		err = client.connect()
 		if err != nil {
 			return errors.Wrap(err, "error streaming warrant updates")
 		}
-	} else if client.config.UpdateStrategy == UpdateStrategyPolling {
+	} else if strings.EqualFold(client.config.UpdateStrategy, UpdateStrategyPolling) {
 		err = client.poll()
 		if err != nil {
 			return errors.Wrap(err, "error polling warrant updates")

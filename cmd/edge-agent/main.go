@@ -33,6 +33,7 @@ const (
 	PropertyRedisPort         = "REDIS_PORT"
 	PropertyStreamingEndpoint = "STREAMING_ENDPOINT"
 	PropertyUpdateStrategy    = "UPDATE_STRATEGY"
+	PropertyPollingFrequency  = "POLLING_FREQUENCY"
 	PropertyReadOnly          = "READ_ONLY"
 )
 
@@ -86,6 +87,7 @@ func main() {
 			ApiEndpoint:       viper.GetString(PropertyApiEndpoint),
 			StreamingEndpoint: viper.GetString(PropertyStreamingEndpoint),
 			UpdateStrategy:    viper.GetString(PropertyUpdateStrategy),
+			PollingFrequency:  viper.GetInt(PropertyPollingFrequency),
 			Repository:        repo,
 		})
 		if err != nil {
