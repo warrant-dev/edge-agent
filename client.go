@@ -91,10 +91,12 @@ func NewClient(conf ClientConfig) (*Client, error) {
 		config.UpdateStrategy = conf.UpdateStrategy
 	}
 
-	if conf.PollingFrequency < 10 {
-		return nil, ErrInvalidPollingFrequency
+	if conf.PollingFrequency != 0 {
+		if conf.PollingFrequency < 10 {
+			return nil, ErrInvalidPollingFrequency
+		}
+		config.PollingFrequency = conf.PollingFrequency
 	}
-	config.PollingFrequency = conf.PollingFrequency
 
 	if strings.EqualFold(config.UpdateStrategy, UpdateStrategyStreaming) {
 		streamingClient := sse.NewClient(fmt.Sprintf("%s/events", config.StreamingEndpoint))
