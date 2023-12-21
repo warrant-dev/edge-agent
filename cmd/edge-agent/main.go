@@ -31,6 +31,7 @@ const (
 	PropertyRedisHostname     = "REDIS_HOSTNAME"
 	PropertyRedisPassword     = "REDIS_PASSWORD"
 	PropertyRedisPort         = "REDIS_PORT"
+	PropertyRedisDatabase     = "REDIS_DATABASE"
 	PropertyStreamingEndpoint = "STREAMING_ENDPOINT"
 	PropertyUpdateStrategy    = "UPDATE_STRATEGY"
 	PropertyPollingFrequency  = "POLLING_FREQUENCY"
@@ -51,6 +52,7 @@ func main() {
 	viper.SetDefault(PropertyRedisHostname, os.Getenv(PropertyRedisHostname))
 	viper.SetDefault(PropertyRedisPort, os.Getenv(PropertyRedisPort))
 	viper.SetDefault(PropertyRedisPassword, os.Getenv(PropertyRedisPassword))
+	viper.SetDefault(PropertyRedisDatabase, os.Getenv(PropertyRedisDatabase))
 	viper.SetDefault(PropertyReadOnly, os.Getenv(PropertyReadOnly))
 
 	if err := viper.ReadInConfig(); err != nil {
@@ -71,6 +73,7 @@ func main() {
 			Hostname: viper.GetString(PropertyRedisHostname),
 			Password: viper.GetString(PropertyRedisPassword),
 			Port:     viper.GetString(PropertyRedisPort),
+			Database: viper.GetInt(PropertyRedisDatabase),
 		})
 		if err != nil {
 			log.Fatal(err)
