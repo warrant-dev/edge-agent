@@ -73,7 +73,7 @@ func (server *Server) check(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var checkManySpec check.CheckManySpec
-	err := service.ParseJSONBody(r.Body, &checkManySpec)
+	err := service.ParseJSONBody(r.Context(), r.Body, &checkManySpec)
 	if err != nil {
 		service.SendErrorResponse(w, err)
 	}

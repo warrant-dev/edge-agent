@@ -28,6 +28,7 @@ type RedisRepositoryConfig struct {
 	Hostname string
 	Password string
 	Port     string
+	Database int
 }
 
 type RedisRepository struct {
@@ -49,9 +50,9 @@ func NewRedisRepository(config RedisRepositoryConfig) (*RedisRepository, error) 
 
 	var connectionString string
 	if config.Password != "" {
-		connectionString = fmt.Sprintf("rediss://default:%s@%s:%s/1", config.Password, hostname, port)
+		connectionString = fmt.Sprintf("rediss://default:%s@%s:%s/%d", config.Password, hostname, port, config.Database)
 	} else {
-		connectionString = fmt.Sprintf("redis://default:%s@%s:%s/1", config.Password, hostname, port)
+		connectionString = fmt.Sprintf("redis://default:%s@%s:%s/%d", config.Password, hostname, port, config.Database)
 	}
 
 	opt, err := redis.ParseURL(connectionString)
