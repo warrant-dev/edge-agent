@@ -204,15 +204,18 @@ func (client *Client) getWarrants() (WarrantSet, error) {
 		return nil, errors.New(fmt.Sprintf("received HTTP %d: %s", respStatus, string(msg)))
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.Wrap(err, "error reading response from server")
-	}
+	warrants := make(WarrantSet)
+	decoder := json.NewDecoder(resp.Body)
+	for decoder.More() {
+		var chunk WarrantSet
+		err := decoder.Decode(&chunk)
+		if err != nil {
+			return nil, errors.Wrap(err, "error reading response from server")
+		}
 
-	var warrants WarrantSet
-	err = json.Unmarshal(body, &warrants)
-	if err != nil {
-		return nil, errors.Wrap(err, "received invalid response from server")
+		for w := range chunk {
+			warrants.Add(w)
+		}
 	}
 
 	return warrants, nil
