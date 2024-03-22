@@ -193,6 +193,7 @@ func (client *Client) getWarrants() (WarrantSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	respStatus := resp.StatusCode
 	if respStatus < 200 || respStatus >= 400 {
