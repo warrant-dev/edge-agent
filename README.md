@@ -8,8 +8,6 @@
 
 # Warrant Edge Agent
 
-[![Slack](https://img.shields.io/badge/slack-join-brightgreen)](https://join.slack.com/t/warrantcommunity/shared_invite/zt-12g84updv-5l1pktJf2bI5WIKN4_~f4w)
-
 ## What is the Warrant Edge Agent?
 
 The Warrant Edge Agent is a lightweight service that can process Warrant access check requests. It can be deployed in any cloud environment to minimize the latency of access check requests from services using Warrant to enforce authorization. The Edge Agent serves access check requests from a local cache and connects to `stream.warrant.dev` to receive updates as access rules are modified in order to keep it's cache up-to-date.
